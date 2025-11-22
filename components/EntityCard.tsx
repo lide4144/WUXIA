@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Entity } from '../types';
+import { Entity, MoveType } from '../types';
 import { HealthBar } from './HealthBar';
+import { Sword, Shield, Zap, Heart } from 'lucide-react';
 
 interface EntityCardProps {
   entity: Entity;
   isPlayer?: boolean;
+  activeAction?: MoveType | null;
 }
 
-export const EntityCard: React.FC<EntityCardProps> = ({ entity, isPlayer }) => {
+export const EntityCard: React.FC<EntityCardProps> = ({ entity, isPlayer, activeAction }) => {
   const prevHp = useRef(entity.stats.hp);
   const prevQi = useRef(entity.stats.qi);
   const [animClass, setAnimClass] = useState('');
@@ -46,13 +48,53 @@ export const EntityCard: React.FC<EntityCardProps> = ({ entity, isPlayer }) => {
     prevQi.current = entity.stats.qi;
   }, [entity.stats.hp, entity.stats.qi]);
 
+  // Render visual overlay for actions
+  const renderActionOverlay = () => {
+    if (!activeAction) return null;
+
+    switch (activeAction) {
+      case MoveType.ATTACK:
+        return (
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+            <Sword size={120} className="text-ink-900 animate-slash opacity-0" />
+          </div>
+        );
+      case MoveType.ULTIMATE:
+        return (
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+            <div className="absolute inset-0 bg-red-900/10 animate-pulse rounded-xl"></div>
+            <Zap size={120} className="text-seal animate-bounce opacity-90" />
+          </div>
+        );
+      case MoveType.DEFEND:
+        return (
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+            <Shield size={100} className="text-ink-600 animate-shield opacity-0" />
+          </div>
+        );
+      case MoveType.HEAL:
+        return (
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+            <Heart size={80} className="text-green-700 animate-heal opacity-0" fill="currentColor" />
+            <Heart size={50} className="text-green-600 animate-heal opacity-0 absolute top-1/3 left-1/3 delay-100" fill="currentColor" />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className={`
       p-6 border-2 bg-ink-50 shadow-lg relative 
       transition-all duration-300 ease-out
       ${isPlayer ? 'rounded-tl-xl' : 'rounded-br-xl'}
+      ${activeAction === MoveType.ULTIMATE ? 'animate-aura border-seal' : ''}
       ${animClass || 'border-ink-800'}
     `}>
+      {/* Action VFX Overlay */}
+      {renderActionOverlay()}
+
       {/* Corner decorations - inherit border color to match flash */}
       <div className="absolute top-1 left-1 w-2 h-2 border-t-2 border-l-2 border-inherit"></div>
       <div className="absolute top-1 right-1 w-2 h-2 border-t-2 border-r-2 border-inherit"></div>

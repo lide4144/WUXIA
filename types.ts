@@ -1,10 +1,12 @@
 export enum GamePhase {
   MENU = 'MENU',
+  STORY_INTERLUDE = 'STORY_INTERLUDE', // New: Show story text before fight
   GENERATING_ENEMY = 'GENERATING_ENEMY',
   PLAYER_TURN = 'PLAYER_TURN',
   PROCESSING_TURN = 'PROCESSING_TURN',
-  VICTORY = 'VICTORY',
+  VICTORY = 'VICTORY', // Round victory
   DEFEAT = 'DEFEAT',
+  GAME_COMPLETE = 'GAME_COMPLETE', // All chapters finished
 }
 
 export interface EntityStats {
@@ -53,4 +55,12 @@ export interface TurnResult {
   playerHealed: number;
   enemyHealed: number;
   narrative: string;
+}
+
+export interface StoryChapter {
+  id: number;
+  title: string;
+  introTitle: string;
+  introText: string;
+  enemyPromptContext: string; // Hint for AI to generate specific enemy type
 }

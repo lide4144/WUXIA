@@ -23,11 +23,15 @@ const enemySchema: Schema = {
   required: ["name", "title", "description", "style", "hp", "atk", "def"],
 };
 
-export const generateEnemy = async (): Promise<Entity> => {
+export const generateEnemy = async (context?: string): Promise<Entity> => {
+  const contextPrompt = context 
+    ? `Specifically generate an enemy fitting this description: ${context}` 
+    : "Generate a unique, dangerous ancient Chinese martial arts antagonist.";
+
   try {
     const response = await ai.models.generateContent({
       model: modelName,
-      contents: "Generate a unique, dangerous ancient Chinese martial arts antagonist for a text-based duel. Return the content in Simplified Chinese.",
+      contents: `${contextPrompt} Return the content in Simplified Chinese. Ensure the stats are balanced for a turn-based RPG.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: enemySchema,
